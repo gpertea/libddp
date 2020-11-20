@@ -13,57 +13,31 @@
   </head>
 
 <body>
-<nav class="navbar navbar-expand-md navbar-light bg-light sticky-top">
-    <div class="container-fluid">
+<div class="container-fluid">
+  <!--div id="header" class="row-lg-12" -->
+      <div class="row-lg-12 navbar bg-light my-header">
         <img src="img/logo.svg" class="img-fluid" style="height:2.3em;background-color: azure;" >
-      <div class="font-weight-bold text-center" style="font-size: 2.1em;color:#ed1848"> D a t a &nbsp; P o r t a l </div>
+        <div class="col-font-weight-bold text-center" style="font-size: 2.1em;color:#ed1848"> D a t a &nbsp; P o r t a l </div>
         <img src="img/brain_with_bg.svg" class="img-fluid" style="height:2.65em;margin-top:0.3em" >
-    </div>
-</nav>
-  <!-- sidebar -->
- <div class="container-fluid">
-    <div class="row">
-      <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block bg-light sidebar">
-    <div class="sidebar-sticky pt-3">
-      <ul class="nav flex-column">
-        <li class="nav-item">
-          <a class="nav-link" href="#">
-            <span data-feather="file"></span>
-            Diagnosis
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#">
-            <span data-feather="shopping-cart"></span>
-            Age
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#">
-            <span data-feather="users"></span>
-            Sex
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#">
-            <span data-feather="bar-chart-2"></span>
-            Race
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#">
-            <span data-feather="layers"></span>
-            Status
-          </a>
-        </li>
-      </ul>
+      </div>
+  <!-- /div -->
 
-      </ul>
+  <div class="row justify-content-center bg-light" style="margin-top: 10px;border:4px solid #f8f9fa;">
+    <div class="col bg-light my-sidebar">
+      Lorem ipsum, dolor sit amet consectetur adipisicing elit. <br>
+      <br><br>
+      Eligendi ullam temporibus vitae reprehenderit earum fugit <br>
+      <br><br>
+      velit recusandae ex nesciunt magnam modi beatae rem, atque<br>
+      <br><br>
+       iste nobis neque sapiente. <br>
+       <br><br>
+       Possimus, quidem!
     </div>
-  </nav>
-  <!-- main content -->   
-      <main role="main" class="col-md-9 ml-sm-auto col-lg-10 px-md-4 bg-light">
-        <div class="col">
+          <!-- main content -->   
+    <div class="col bg-light">
+        <div class="col matrixWrap mx-auto ">
+          <h4>Region Matrix</h4>
           <table id="rxMatrix"> <!-- filled by fillXMatrix() -->
             <thead>
               <tr>
@@ -74,9 +48,9 @@
             </tbody>
           </table>
         </div>
-      </main>
     </div>
-  </div>
+  </div> <!-- main content row -->
+</div> <!-- container -->
 
 <!-- Bootstrap JS Requirements -->
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" 

@@ -49,14 +49,18 @@ function fillXMatrix() {
  //populate top header 
  $('#rxMatrix > thead > tr').append(
   $.map(dtaXTypes, function(xt) { 
-     return '<th class="xt"><div><span>'+xt+'</span></div></th>';
+     return '<th class="rt"><div><span>'+xt+'</span></div></th>';
   }).join());
   //populate rows:
   $('#rxMatrix > tbody').append(
     $.map(dtaRegs, function(r, i) { 
       return '<tr> <th>'+r+'</th>'+
          $.map(dtaXTypes, function(x,j) {
-           return '<td>'+Math.floor(Math.random() * 386)+'</td>';
+           var v=Math.floor(Math.random() * 126);
+           if (v%3==0) v=Math.floor(Math.random() * 36);
+           if (v%3==0 ) v=0;
+           if (v==0) v='';
+           return '<td>'+v+'</td>';
          }).join() + " </tr>\n";
    }).join());
 }
