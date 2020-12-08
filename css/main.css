@@ -127,5 +127,8 @@ html,body { height:100%; }
   border-top: none;
 }
 
-
+#glog {
+  border:1px solid pink;
+  height:100px;
+}
 

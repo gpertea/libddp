@@ -1,6 +1,4 @@
 // place my custom js here
-var selcol;
-var selregs=[];
 var dtaRegs=[ 'DLPFC','Hippocampus', 'Caudate', 'MPFC', 
   'sACC','Cerebellum', 'Entorhinal Cortex', 'Amygdala' ,
   'Median Amygdala','Basolaterlal Amygdala','Nucleus Accumbens',
@@ -9,12 +7,13 @@ var dtaRegs=[ 'DLPFC','Hippocampus', 'Caudate', 'MPFC',
 var dtaXTypes=[ 'RNA-seq', 'long read RNA-seq', 'scRNA-seq', 'micro RNA-seq',
   'WGS', 'WGBS', 'DNA methylation', 'ATAC-seq' ];
 
+var selcol=0;
+var selregs=[]; 
 for (var i=0;i<dtaRegs.length;i++) selregs.push(0);
 
 var mxMaxVal = 146; //maximum value in the matrix (for shading)
 var shadeCl='#FFF4F4';
 var shadeClrgb='rgb(255,240,240)';
-
 
 $(document).ready(function() {
     fillXMatrix(); //get data and fill matrix
@@ -36,8 +35,15 @@ $(document).ready(function() {
         t.siblings('td').each(function() {
            tdHighlight($(this));
         });
-        t.siblings('th').css('background-color', shadeCl);
-        t.siblings('th').css('color', '#222');
+        var th=t.siblings('th');
+        if (selregs[t.parent().index()]) {
+          th.css('background-color', shadeCl);
+          th.css('color', '#800');
+        } else { //regular, not selected region
+          th.css('background-color', shadeCl);
+          th.css('color', '#222');
+        }
+
         var ind = t.index()+1;
         //$('#rxMatrix td:nth-child(' + ind + ')').css('background-color', shadeCl);
         $('#rxMatrix td:nth-child(' + ind + ')').each( function() {
@@ -46,7 +52,14 @@ $(document).ready(function() {
         //t.css('background-color','#FFFFEE');
         tdHighlight(t);
         //find the span inside the div
-        $('#rxMatrix th:nth-child(' + ind + ') > div > span').css('color', '#222');
+        var ch=$('#rxMatrix th:nth-child(' + ind + ') > div > span');
+        if (ind-1==selcol) {
+          ch.css('color', '#800');
+          ch.css('font-weight', 'bold');
+        } else {
+          ch.css('color', '#222');
+          ch.css('font-weight', '600');
+        }
       }, function() {
         var t=$(this);
         //t.siblings('td').css('background-color', ''); 
@@ -54,26 +67,81 @@ $(document).ready(function() {
           tdColRestore($(this));
         });
 
-        t.siblings('th').css('color', ''); 
-        t.siblings('th').css('background-color', ''); 
+        var th=t.siblings('th');
+        if (selregs[t.parent().index()]) {
+          th.css('color', '#800'); 
+          th.css('background-color', ''); 
+        } else {
+           th.css('color', ''); 
+           th.css('background-color', ''); 
+        }
         var ind = t.index()+1;
         //$('#rxMatrix td:nth-child(' + ind + ')').css('background-color', ''); 
         $('#rxMatrix td:nth-child(' + ind + ')').each( function() {
           tdColRestore($(this));
         });
-        $('#rxMatrix th:nth-child(' + ind + ') > div > span').css('color', '');
+        var ch=$('#rxMatrix th:nth-child(' + ind + ') > div > span');
+        if (ind-1==selcol) {
+          ch.css('color', '#800');
+          ch.css('font-weight', 'bold');
+        } else {
+          ch.css('color', '');
+        }
       });
 
       $("#rxMatrix td").click( function() {
-        var $t=$(this);
-        var colidx = $t.index()-1;
-        var rowidx =  $t.parent().index();
-        $t.css('font-weight','bold');
-        console.log("Text for selected cell is: "+$t.text()+ " with col index "+colidx+ " and row index "+rowidx);
+        var t=$(this);
+        var coln = t.index(); // 1-based !
+        var rowidx =  t.parent().index();
+        if (selcol>0 && selcol!=coln) return; //ignore click outside the allowed column
+        if (selregs[rowidx]) deselectCell(t, rowidx);
+                        else selectCell(t, coln, rowidx);
+        
+        //console.log("Text for selected cell is: "+$t.text()+ " with col index "+colidx+ " and row index "+rowidx);
+        glog("Text for selected cell is: ["+t.text()+ "] with col num "+coln+ " and row index "+rowidx+" (selregs["+rowidx+"]="+selregs[rowidx]+")");
         //alert("Text: "+$t.text());
       });
 
 });
+
+function selectCell(t, cnum, ridx) {
+  if (t.html().trim().length==0) return;
+  t.css('font-weight','bold');
+  var th=t.siblings('th')
+  th.css('color', '#800');
+  th.css('font-weight', 'bold');
+  selregs[ridx]=1;
+  if (selcol==0) {
+    var ind=cnum+1;
+    var ch=$('#rxMatrix th:nth-child(' + ind + ') > div > span');
+    ch.css('color', '#800');
+    ch.css('font-weight', 'bold');
+    selcol=cnum;
+  }
+}
+
+function deselectCell(t, ridx) {
+  t.css('font-weight','normal');
+  selregs[ridx]=0;
+  var th=t.siblings('th')
+  th.css('color', '#222');
+  th.css('font-weight', '600');
+  var sel=0;
+  for (i=0;i<selregs.length;i++) {
+    if (selregs[i]) { sel=1; break; }
+  }
+  if (sel==0) {
+    //deselect column
+    if (selcol) {
+      var ind=selcol+1;
+      var ch=$('#rxMatrix th:nth-child(' + ind + ') > div > span');
+      ch.css('color', '#222');
+      ch.css('font-weight', '600');
+    }
+    selcol=0;
+  }
+}
+
 
 function fillXMatrix() {
  //populate top header 
@@ -138,4 +206,8 @@ function shadeRGBColor(color, percent) {
 function blendRGBColors(c0, c1, p) {
   var f=c0.split(","),t=c1.split(","),R=parseInt(f[0].slice(4)),G=parseInt(f[1]),B=parseInt(f[2]);
   return "rgb("+(Math.round((parseInt(t[0].slice(4))-R)*p)+R)+","+(Math.round((parseInt(t[1])-G)*p)+G)+","+(Math.round((parseInt(t[2])-B)*p)+B)+")";
+}
+
+function glog(a) {
+  $( "#glog" ).html(a);
 }
