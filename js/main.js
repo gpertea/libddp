@@ -12,8 +12,9 @@ var selregs=[];
 for (var i=0;i<dtaRegs.length;i++) selregs.push(0);
 
 var mxMaxVal = 146; //maximum value in the matrix (for shading)
-var shadeCl='#FFF4F4';
-var shadeClrgb='rgb(255,240,240)';
+var clShadeHover='#FFF4F4';
+var clShadeHoverRGB='rgb(255,240,240)';
+var clHdrSelFg='#A00';
 
 $(document).ready(function() {
     fillXMatrix(); //get data and fill matrix
@@ -26,6 +27,58 @@ $(document).ready(function() {
       });
      });
 
+
+     $(document).on('click', '.lg-title', function(e){
+      var t = $(this);
+      var p = t.parents('.lg-panel').find('.lg-scroller');
+    if(!t.hasClass('lg-collapsed')) {
+      p.collapse('hide');
+      t.addClass('lg-collapsed');
+      t.find('.coll-glyph').html("&#x25BD;")
+      //$this.find('b').removeClass('bi-chevron-up').addClass('bi-chevron-down');
+    } else {
+      p.collapse('show');
+      t.removeClass('lg-collapsed');
+      t.find('.coll-glyph').html("&#x25B3;")
+      //$this.find('b').removeClass('bi-chevron-down').addClass('bi-chevron-up');
+    }
+  })
+  
+  $(document).on('click', '.lg-item', function(e){
+      var t = $(this);
+      glog("clicked item: "+t.html());
+      if(!t.hasClass('lg-sel')) {
+      //var p=$this.parents('.panel').find('.panel-body');
+      t.addClass('lg-sel');
+      //$this.find('b').removeClass('bi-chevron-up').addClass('bi-chevron-down');
+    } else {
+      t.removeClass('lg-sel');
+      //$this.find('b').removeClass('bi-chevron-down').addClass('bi-chevron-up');
+    }
+  })
+  
+  
+  $('.lg-scroller').on('scroll', function(e) {
+      var t = $(this);
+      var y = t.scrollTop();
+      var p = t.parents('.lg-panel').find('.lg-title');
+      var l = t.parents('.lg-panel').find('.lg-lst');
+      glog("scrollTop value is:  "+ y + "; inner height: " + t.innerHeight()
+         + ", list height: " + l.outerHeight() );
+      if (y>0) {
+         p.addClass('lg-b-shadow');
+      }
+      else {
+         p.removeClass('lg-b-shadow');
+      }
+      if (y+t.innerHeight()>=l.outerHeight()) {
+        t.removeClass('lg-in-shadow');
+      } else {
+        t.addClass('lg-in-shadow');
+      }
+  })
+
+
     //matrix hover behavior
     $("#rxMatrix td").hover(function()  {
         var t=$(this);
@@ -37,10 +90,10 @@ $(document).ready(function() {
         });
         var th=t.siblings('th');
         if (selregs[t.parent().index()]) {
-          th.css('background-color', shadeCl);
-          th.css('color', '#800');
+          th.css('background-color', clShadeHover);
+          th.css('color', clHdrSelFg);
         } else { //regular, not selected region
-          th.css('background-color', shadeCl);
+          th.css('background-color', clShadeHover);
           th.css('color', '#222');
         }
 
@@ -54,7 +107,7 @@ $(document).ready(function() {
         //find the span inside the div
         var ch=$('#rxMatrix th:nth-child(' + ind + ') > div > span');
         if (ind-1==selcol) {
-          ch.css('color', '#800');
+          ch.css('color', clHdrSelFg);
           ch.css('font-weight', 'bold');
         } else {
           ch.css('color', '#222');
@@ -69,7 +122,7 @@ $(document).ready(function() {
 
         var th=t.siblings('th');
         if (selregs[t.parent().index()]) {
-          th.css('color', '#800'); 
+          th.css('color', clHdrSelFg); 
           th.css('background-color', ''); 
         } else {
            th.css('color', ''); 
@@ -82,7 +135,7 @@ $(document).ready(function() {
         });
         var ch=$('#rxMatrix th:nth-child(' + ind + ') > div > span');
         if (ind-1==selcol) {
-          ch.css('color', '#800');
+          ch.css('color', clHdrSelFg);
           ch.css('font-weight', 'bold');
         } else {
           ch.css('color', '');
@@ -108,13 +161,13 @@ function selectCell(t, cnum, ridx) {
   if (t.html().trim().length==0) return;
   t.css('font-weight','bold');
   var th=t.siblings('th')
-  th.css('color', '#800');
+  th.css('color', clHdrSelFg);
   th.css('font-weight', 'bold');
   selregs[ridx]=1;
   if (selcol==0) {
     var ind=cnum+1;
     var ch=$('#rxMatrix th:nth-child(' + ind + ') > div > span');
-    ch.css('color', '#800');
+    ch.css('color', clHdrSelFg);
     ch.css('font-weight', 'bold');
     selcol=cnum;
   }
@@ -179,10 +232,10 @@ function fillXMatrix() {
 function tdHighlight(t) {
   var obg=t.prop('obg');
   if (obg) {
-    var nc=blendRGBColors(obg, shadeClrgb, 0.1);
+    var nc=blendRGBColors(obg, clShadeHoverRGB, 0.1);
     t.css('background-color', nc );
   }
-  else t.css('background-color', shadeCl);
+  else t.css('background-color', clShadeHover);
 }
 
 function tdColRestore(t) {
