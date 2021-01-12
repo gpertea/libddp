@@ -4,8 +4,56 @@ var dtaRegs=[ 'DLPFC','Hippocampus', 'Caudate', 'MPFC',
   'Median Amygdala','Basolaterlal Amygdala','Nucleus Accumbens',
   'Insular Cortex','Subiculum','Dentate Gyrus','Ventral Tegmental Area'
   ];
+
 var dtaXTypes=[ 'RNA-seq', 'long read RNA-seq', 'scRNA-seq', 'micro RNA-seq',
   'WGS', 'WGBS', 'DNA methylation', 'ATAC-seq' ];
+
+//-- JSON data from database 
+var dtaRegion= [{"id":1,"name":"Amygdala","num":548}, 
+  {"id":2,"name":"BasoAmyg","num":318}, 
+  {"id":3,"name":"Caudate","num":464}, 
+  {"id":4,"name":"dACC","num":322}, 
+  {"id":5,"name":"DentateGyrus","num":263}, 
+  {"id":6,"name":"DLPFC","num":1599}, 
+  {"id":7,"name":"Habenula","num":69}, 
+  {"id":8,"name":"HIPPO","num":539}, 
+  {"id":9,"name":"MedialAmyg","num":322}, 
+  {"id":10,"name":"mPFC","num":297}, 
+  {"id":11,"name":"NAc","num":235}, 
+  {"id":12,"name":"sACC","num":560}];
+
+var dtaDataset=[{"id":1,"name":"Astellas_DG","num":263}, 
+    {"id":2,"name":"BrainSeq_Phase1","num":727}, 
+    {"id":3,"name":"BrainSeq_Phase2_DLPFC","num":453}, 
+    {"id":4,"name":"BrainSeq_Phase2_HIPPO","num":447}, 
+    {"id":5,"name":"BrainSeq_Phase3_Caudate","num":464}, 
+    {"id":6,"name":"BrainSeq_Phase4and5","num":490}, 
+    {"id":7,"name":"Habenula","num":69}, 
+    {"id":8,"name":"Nicotine_NAc","num":235}, 
+    {"id":9,"name":"psychENCODE_BP","num":17}, 
+    {"id":10,"name":"psychENCODE_Mood","num":1091}, 
+    {"id":11,"name":"VA_PTSD","num":1280}];
+
+var dtaDx=[{"id":1,"name":"Control","num":2509}, 
+{"id":2,"name":"Schizo","num":822}, 
+{"id":3,"name":"Bipolar","num":649}, 
+{"id":4,"name":"MDD","num":1248}, 
+{"id":5,"name":"PTSD","num":306}, 
+{"id":6,"name":"Other","num":2}];
+
+var dtaSex=[{"id":1,"name":"M","num":3714}, 
+ {"id":2,"name":"F","num":1822}];
+
+var dtaRace=[{"id":1,"name":"AA","num":1599}, 
+ {"id":2,"name":"AS","num":36}, 
+ {"id":3,"name":"CAUC","num":3839}, 
+ {"id":4,"name":"HISP","num":59}, 
+ {"id":5,"name":"Other","num":3}];
+
+var dtaProtocol= [{"id":1,"name":"PolyA","num":727}, 
+ {"id":2,"name":"RiboZeroGold","num":1450}, 
+ {"id":3,"name":"RiboZeroHMR","num":404}, 
+ {"id":4,"name":"(unknown)","num":2955}];
 
 var selcol=0;
 var selregs=[]; 
@@ -18,15 +66,22 @@ var clHdrSelFg='#A00';
 
 $(document).ready(function() {
     fillXMatrix(); //get data and fill matrix
-    // fillFilters()
+    populateFilter('fltDx', dtaDx); //populate Diagnosis filter
+    populateFilter('fltRace', dtaRace); //populate Diagnosis filter
+    populateFilter('fltDataset', dtaDataset); //populate Diagnosis filter
+    populateFilter('fltSex', dtaSex); //populate Diagnosis filter
+    populateFilter('fltProto', dtaProtocol); //populate Diagnosis filter
+    //popGenderFilter();
+    //showAgeFilter();
+    //popRaceFilter();
     
-    // enable some controls:
+    /* enable some controls:
     $(function() {
       $('.multiselect-ui').multiselect({
           includeSelectAllOption: true
       });
      });
-
+     */
 
      $(document).on('click', '.lg-title', function(e){
       var t = $(this);
@@ -86,7 +141,10 @@ $(document).ready(function() {
         $this.siblings().addClass('hover_hl'); */
         //$t.siblings('td').css('background-color', shadeCl);
         t.siblings('td').each(function() {
-           tdHighlight($(this));
+          var td=$(this);
+          var coln = td.index(); // 1-based !
+          var ridx =  td.parent().index();
+           tdHighlight(td, ridx, coln);
         });
         var th=t.siblings('th');
         if (selregs[t.parent().index()]) {
@@ -100,10 +158,11 @@ $(document).ready(function() {
         var ind = t.index()+1;
         //$('#rxMatrix td:nth-child(' + ind + ')').css('background-color', shadeCl);
         $('#rxMatrix td:nth-child(' + ind + ')').each( function() {
-          tdHighlight($(this));
+          var td=$(this);
+          tdHighlight(td, td.parent().index(), td.index());
         });
         //t.css('background-color','#FFFFEE');
-        tdHighlight(t);
+        tdHighlight(t, t.parent().index(), ind-1);
         //find the span inside the div
         var ch=$('#rxMatrix th:nth-child(' + ind + ') > div > span');
         if (ind-1==selcol) {
@@ -117,7 +176,8 @@ $(document).ready(function() {
         var t=$(this);
         //t.siblings('td').css('background-color', ''); 
         t.siblings('td').each( function() {
-          tdColRestore($(this));
+          var td=$(this);
+          tdColRestore(td, td.parent().index(), td.index());
         });
 
         var th=t.siblings('th');
@@ -131,7 +191,8 @@ $(document).ready(function() {
         var ind = t.index()+1;
         //$('#rxMatrix td:nth-child(' + ind + ')').css('background-color', ''); 
         $('#rxMatrix td:nth-child(' + ind + ')').each( function() {
-          tdColRestore($(this));
+          var td=$(this);
+          tdColRestore(td, td.parent().index(), td.index());
         });
         var ch=$('#rxMatrix th:nth-child(' + ind + ') > div > span');
         if (ind-1==selcol) {
@@ -151,7 +212,7 @@ $(document).ready(function() {
                         else selectCell(t, coln, rowidx);
         
         //console.log("Text for selected cell is: "+$t.text()+ " with col index "+colidx+ " and row index "+rowidx);
-        glog("Text for selected cell is: ["+t.text()+ "] with col num "+coln+ " and row index "+rowidx+" (selregs["+rowidx+"]="+selregs[rowidx]+")");
+        //glog("Text for selected cell is: ["+t.text()+ "] with col num "+coln+ " and row index "+rowidx+" (selregs["+rowidx+"]="+selregs[rowidx]+")");
         //alert("Text: "+$t.text());
       });
 
@@ -160,6 +221,8 @@ $(document).ready(function() {
 function selectCell(t, cnum, ridx) {
   if (t.html().trim().length==0) return;
   t.css('font-weight','bold');
+  t.css('color', '#fff');
+  t.css('background-color', clHdrSelFg);
   var th=t.siblings('th')
   th.css('color', clHdrSelFg);
   th.css('font-weight', 'bold');
@@ -175,6 +238,11 @@ function selectCell(t, cnum, ridx) {
 
 function deselectCell(t, ridx) {
   t.css('font-weight','normal');
+  var obg=t.prop('obg');
+  var ofg=t.prop('ofg');
+  if (ofg) t.css('color', ofg);
+  if (obg) t.css('background-color', obg);
+  
   selregs[ridx]=0;
   var th=t.siblings('th')
   th.css('color', '#222');
@@ -195,40 +263,6 @@ function deselectCell(t, ridx) {
   }
 }
 
-
-function fillXMatrix() {
- //populate top header 
- $('#rxMatrix > thead > tr').append(
-  $.map(dtaXTypes, function(xt) { 
-     return '<th class="rt"><div><span>'+xt+'</span></div></th>';
-  }).join());
-  //populate rows:
-  $('#rxMatrix > tbody').append(
-    $.map(dtaRegs, function(r, i) { 
-      return '<tr> <th>'+r+'</th>'+
-         $.map(dtaXTypes, function(x,j) {
-           var v=Math.floor(Math.random() * mxMaxVal);
-           if (v%3==0) v=Math.floor(Math.random() * mxMaxVal);
-           else v=0;
-          if (v==0) v='';
-          return '<td>'+v+'</td>';
-         }).join() + " </tr>\n";
-   }).join());
-   // now iterate through all cells to record their original color values
-   $('#rxMatrix td').each(function() {
-       var v=$(this).html();
-       if (v>0) {
-        var psh=v/(mxMaxVal*1.5); 
-        var bc=shadeRGBColor('rgb(240,240,240)', -psh);
-        var fg=(getRGBLuminance(bc)<120)? '#fff':'#000';
-         $(this).prop('obg', bc);
-         $(this).css('background-color', bc);
-         $(this).prop('ofg',fg);
-         $(this).css('color', fg);
-       }
-   });
-}
-
 function tdHighlight(t) {
   var obg=t.prop('obg');
   if (obg) {
@@ -245,6 +279,58 @@ function tdColRestore(t) {
   }
   else t.css('background-color', '');
 }
+
+
+function fillXMatrix() {
+ //populate top header 
+ $('#rxMatrix > thead > tr').append(
+  $.map(dtaXTypes, function(xt) { 
+     return '<th class="rt"><div><span>'+xt+'</span></div></th>';
+  }).join());
+  //populate rows:
+  $('#rxMatrix > tbody').append(
+    $.map(dtaRegion, function(r, i) { 
+      return '<tr> <th>'+r.name+'</th>'+
+         $.map(dtaXTypes, function(x,j) {
+           var v=0;
+           if (j>0) { //generate randomly
+             v=Math.floor(Math.random() * mxMaxVal);
+             if (v%3==0) v=Math.floor(Math.random() * mxMaxVal);
+              else v=0;
+           } else {
+             v=r.num;
+           }
+           if (v==0) v='';
+           return '<td>'+v+'</td>';
+         }).join() + " </tr>\n";
+   }).join());
+   // now iterate through all cells to record their original color values
+   $('#rxMatrix td').each(function() {
+       var v=$(this).html();
+       if (v>0) {
+        var psh=v/(mxMaxVal*4.1); 
+        var bc=shadeRGBColor('rgb(240,240,240)', -psh);
+        var fg=(getRGBLuminance(bc)<120)? '#fff':'#000';
+         $(this).prop('obg', bc);
+         $(this).css('background-color', bc);
+         $(this).prop('ofg',fg);
+         $(this).css('color', fg);
+       }
+   });
+}
+
+function populateFilter(id, dta) {
+  /* <li class="d-flex justify-content-between lg-item">
+    First one <span class="badge-primary badge-pill lg-count">24</span>
+    </li> */
+  $('#'+id+' .lg-lst').append(
+    $.map(dta, function(d,i) { 
+       return '<li class="d-flex justify-content-between lg-item">'+d.name+
+         ' <span class="badge-primary badge-pill lg-count">'+d.num+'</span>'+
+         "</li>\n";
+    }).join(''));
+}
+
 
 function getRGBLuminance(color) {
   var f=color.split(","),R=parseInt(f[0].slice(4)),G=parseInt(f[1]),B=parseInt(f[2]);

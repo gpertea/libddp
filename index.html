@@ -25,66 +25,66 @@
   <div class="row justify-content-center bg-light" style="margin-top: 10px;border:4px solid #f8f9fa;">
     <div class="col bg-light my-sidebar">
       <div class="row">
-        Diagnosis
-        <select id="dxFilter" class="multiselect-ui form-control" multiple="multiple">
-           <option value="Fetal">Fetal</option>
-           <option value="Control">Control</option>
-           <option value="SCZD">SCZD</option>
-           <option value="BPD">BPD</option>
-           <option value="MDD">MDD</option>
-           <option value="PTSD">PTSD</option>
-           <option value="AD">AD</option>
-           <option value="ASD">ASD</option>
-        </select>
-        <div class="lg-panel">
+        <div class="lg-panel" id="fltDx">
           <div class="lg-title">
             Diagnosis <span class="float-right coll-glyph">&#x25B3;</span>
           </div>
-          <!-- div class="lg-overlay"> </div-->
           <div class="collapse show lg-scroller lg-in-shadow">
-          
            <ul class="lg-lst">
-             <li class="d-flex justify-content-between lg-item">
-              First one <span class="badge-primary badge-pill lg-count">24</span>
-             </li>
-             <li class="d-flex justify-content-between lg-item">
-               Cras justo odio <span class="badge-primary badge-pill lg-count">14</span>
-             </li>
-             <li class="d-flex justify-content-between lg-item">
-               Dapibus ac facilisis <span class="badge-primary badge-pill lg-count">2</span>
-             </li>
-             <li class="d-flex justify-content-between lg-item">
-               Morbi leo risus <span class="badge-primary badge-pill lg-count">1</span>
-             </li>
-             <li class="d-flex justify-content-between lg-item">
-               Memento Mori <span class="badge-primary badge-pill lg-count">4</span>
-             </li>
-             <li class="d-flex justify-content-between lg-item">
-               Et Pavarotti <span class="badge-primary badge-pill lg-count">2</span>
-             </li>
+           </ul>
+          </div> <!-- lg-scroller -->
+         </div> <!-- lg-panel -->
+        </div> <!-- row -->
+        <div class="row" style="height:2em;"> </div> 
+        <div class="lg-panel" id="fltRace">
+          <div class="lg-title">
+            Race <span class="float-right coll-glyph">&#x25B3;</span>
+          </div>
+          <div class="collapse show lg-scroller lg-in-shadow">
+           <ul class="lg-lst">
            </ul>
           </div> <!-- lg-scroller -->
          </div> <!-- lg-panel -->
 
+         <div class="row" style="height:2em;"> </div> 
+         <div class="lg-panel" id="fltSex">
+           <div class="lg-title">
+             Sex <span class="float-right coll-glyph">&#x25B3;</span>
+           </div>
+           <div class="collapse show lg-scroller lg-in-shadow">
+            <ul class="lg-lst">
+            </ul>
+           </div> <!-- lg-scroller -->
+          </div> <!-- lg-panel -->
 
+          <div class="lg-panel" id="fltDataset">
+            <div class="lg-title">
+              Dataset <span class="float-right coll-glyph">&#x25B3;</span>
+            </div>
+            <div class="collapse show lg-scroller lg-in-shadow">
+             <ul class="lg-lst">
+             </ul>
+            </div> <!-- lg-scroller -->
+           </div> <!-- lg-panel -->
+ 
+          <div class="row" style="height:2em;"> </div> 
+          <div class="lg-panel" id="fltProto">
+            <div class="lg-title">
+              Sequencing protocol <span class="float-right coll-glyph">&#x25B3;</span>
+            </div>
+            <div class="collapse show lg-scroller lg-in-shadow">
+             <ul class="lg-lst">
+             </ul>
+            </div> <!-- lg-scroller -->
+           </div> <!-- lg-panel -->
+          <div class="row" style="height:2em;"> </div> 
 
-      </div>
-
-
-      Lorem ipsum, dolor sit amet consectetur adipisicing elit. <br>
-      <br><br>
-      Eligendi ullam temporibus vitae reprehenderit earum fugit <br>
-      <br><br>
-      velit recusandae ex nesciunt magnam modi beatae rem, atque<br>
-      <br><br>
-       iste nobis neque sapiente. <br>
-       <br><br>
-       Possimus, quidem!
+ 
     </div>
           <!-- main content -->   
     <div class="col bg-light">
         <div class="col matrixWrap mx-auto ">
-          <h4>Region Matrix</h4>
+          <h4 style="margin-left:-2.4em;">Region Matrix</h4>
           <table id="rxMatrix"> <!-- filled by fillXMatrix() -->
             <thead>
               <tr>
@@ -95,9 +95,10 @@
             </tbody>
           </table>
         </div>
+        <br/> <br/> <br/> <br/>
     </div>
   </div> <!-- main content row -->
-  <div id="glog" class="row">This is just a test</div>
+  <!-- div id="glog" class="row">debug zone </div -->
 </div> <!-- container -->
 
 <!-- Bootstrap JS Requirements -->
